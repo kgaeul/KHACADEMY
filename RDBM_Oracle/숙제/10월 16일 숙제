@@ -1,0 +1,156 @@
+--1.계열정보를 저장할 카테고리 테이블 생성
+create table TB_category(
+name varchar2(10),
+use_yn char(1)
+);
+
+--2.과목 구분을 저장할 테이블 생성
+create table TB_CLASS_TYPE(
+no varchar2(5) primary key,
+name varchar2(10)
+);
+
+--3.tb category 에 primary key를 생성
+alter table TB_category add primary key(name);
+
+--4.tb_class_type 테이블에 name 컬럼에 null값이 들어가지 않도록 속성 변경
+alter table tb_class_type modify name varchar2(10) not null;
+
+--5. 두 테이블에서 컬럼 명이 no인것은 기존 타입을 유지하면서 크기는 10으로 컬렴명이 name은 20으로 변경
+alter table TB_CLASS_TYPE modify no varchar2(10);
+alter table TB_CLASS_TYPE modify name varchar(20);
+alter table TB_category modify name varchar(20);
+
+--6.각자 앞에 테이블 이름 붙이기
+alter table TB_category rename column name to category_name;
+alter table tb_class_type rename column name to class_type_name;
+alter table tb_class_type rename column no to class_type_no;
+
+--7.두 테이블의 primary키 이름 변경
+alter table tb_class_type rename column class_type_no to pk_class_type_no;
+alter table TB_category rename column category_name to pk_category_name;
+
+--8.insert 문 수행
+insert into TB_category(pk_category_name,use_yn)
+values('공학','y');
+insert into TB_category(pk_category_name,use_yn)
+values('자연과학','y');
+insert into TB_category(pk_category_name,use_yn)
+values('의학','y');
+insert into TB_category(pk_category_name,use_yn)
+values('예체능','y');
+insert into TB_category(pk_category_name,use_yn)
+values('인문사회','y');
+
+--9.외래 키 지정  fk_department_category
+alter table TB_department 
+add constraint fk_department_category 
+foreign key(pk_category_name) 
+references TB_category(pk_category_name);
+
+
+
+--10.뷰 만들기
+create or replace view vw_학생일반정보
+as
+select 
+ts.student_name ,
+ts.student_address,
+ts.student_no
+from tb_student ts
+;
+
+--11.뷰 만들기
+create or replace view vw_지도면담
+as
+select 
+ts.student_name ,
+td.department_name,
+tp.professor_name
+from tb_student ts 
+join tb_professor tp on tp.professor_no = ts.coach_professor_no
+join TB_department td on td.department_no = ts.department_no
+order by td.department_name asc
+;
+
+--12.뷰 만들기
+create or replace view vw_학과별학생수
+as
+select td.department_name, count(ts.department_no) student_count
+from TB_department td
+join tb_student ts on ts.department_no = td.department_no
+group by  td.department_name
+order by student_count desc
+;
+
+--13.
+update vw_학생일반정보 set student_name='김가을' where student_no ='A213046';
+
+--14.
+
+
+--15.
+select ;
+
+--================================================================---------
+--DML
+
+--1.과목 유형 테이블에 아래와 같은 데이터를 입력하세요
+insert into TB_CLASS_TYPE(pk_class_type_no,CLASS_TYPE_name)
+values (01,'전공필수');
+insert into TB_CLASS_TYPE(pk_class_type_no,CLASS_TYPE_name)
+values (02,'전공선택');
+insert into TB_CLASS_TYPE(pk_class_type_no,CLASS_TYPE_name)
+values (03,'교양필수');
+insert into TB_CLASS_TYPE(pk_class_type_no,CLASS_TYPE_name)
+values (04,'교양선택');
+insert into TB_CLASS_TYPE(pk_class_type_no,CLASS_TYPE_name)
+values (05,'논문지도');
+
+
+--2. 서브쿼리 이용하여 학생일반정보 테이블 만들기
+create table TB_학생일반정보(
+학번 number(10) primary key,
+학생이름 varchar2(20),
+주소 varchar2(20)
+);
+
+--3. create table
+create table TB_국어국문학과(
+학번 number(10) primary key,
+학생이름 varchar2(20),
+출생년도 extract(student_ssn ),
+교수이름 varchar2(20)
+);
+
+--4. 
+update tb_department set capacity=round(capacity*1.1);
+
+--5.
+update tb_student set student_address='서울시 종로구 숭인동 181-21' where student_name='박건우';
+
+--6.
+select substr(student_ssn,1,6)
+from tb_student;
+
+--7.
+update tb_grade set point=3.5 where ;
+--A331101
+select*from tb_student where student_name='김명훈';
+
+select*from tb_grade where student_no='A331101';
+--C3843900
+select*from tb_class where class_no='C3843900';
+
+update tb_grade set point=3.5 where class_no='C3843900';
+
+--8.
+delete point 
+from tb_grade 
+where 
+    (select absence_yn 
+           from tb_student 
+           where absence_yn='Y')
+;
+
+
